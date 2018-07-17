@@ -6,7 +6,7 @@ using Registrar.Models;
 namespace Registrar.Tests
 {
   [TestClass]
-  public class CategoryTests : IDisposable
+  public class StudentTests : IDisposable
   {
     public void Dispose()
     {
@@ -14,144 +14,88 @@ namespace Registrar.Tests
       Course.DeleteAll();
       Student.DeleteAllJoin();
     }
-    public CategoryTests()
+    public StudentTests()
     {
         DBConfiguration.ConnectionString = "server=localhost;user id=root;password=root;port=8889;database=registrar_test;";
     }
-
-
     [TestMethod]
-    public void Equals_ReturnsTrueForSameName_Category()
-    {
-      //Arrange, Act
-      Category firstCategory = new Category("Household chores");
-      Category secondCategory = new Category("Household chores");
-
-      //Assert
-      Assert.AreEqual(firstCategory, secondCategory);
-    }
-    [TestMethod]
-    public void GetAll_CategoriesEmptyAtFirst_0()
-    {
-      //Arrange, Act
-      int result = Category.GetAll().Count;
-
-      //Assert
-      Assert.AreEqual(0, result);
-    }
-
-
-    [TestMethod]
-    public void Save_SavesCategoryToDatabase_CategoryList()
+    public void Save_GetAllStudents_Test()
     {
       //Arrange
-      Category testCategory = new Category("Household chores");
-      testCategory.Save();
+      Student newStudent = new Student("Derek Hammer");
+      Student newStudent1 = new Student("Eddie Harris");
+      newStudent.Save();
+      newStudent1.Save();
 
       //Act
-      List<Category> result = Category.GetAll();
-      List<Category> testList = new List<Category>{testCategory};
+      List<Student> expectedResult = new List<Student>{newStudent, newStudent1};
+      List<Student> result = Student.GetAllStudents();
 
       //Assert
-      CollectionAssert.AreEqual(testList, result);
-    }
-
-
-    [TestMethod]
-    public void Save_DatabaseAssignsIdToCategory_Id()
-    {
-      //Arrange
-      Category testCategory = new Category("Household chores");
-      testCategory.Save();
-
-      //Act
-      Category savedCategory = Category.GetAll()[0];
-
-      int result = savedCategory.GetId();
-      int testId = testCategory.GetId();
-
-      //Assert
-      Assert.AreEqual(testId, result);
-      }
-
-
-    [TestMethod]
-    public void Find_FindsCategoryInDatabase_Category()
-    {
-      //Arrange
-      Category testCategory = new Category("Household chores");
-      testCategory.Save();
-
-      //Act
-      Category foundCategory = Category.Find(testCategory.GetId());
-
-      //Assert
-      Assert.AreEqual(testCategory, foundCategory);
+      CollectionAssert.AreEqual(expectedResult, result);
     }
     [TestMethod]
-    public void Delete_DeletesCategoryAssociationsFromDatabase_CategoryList()
+    public void Find_Test()
     {
       //Arrange
-      Item testItem = new Item("Mow the lawn");
-      testItem.Save();
-
-      string testName = "Home stuff";
-      Category testCategory = new Category(testName);
-      testCategory.Save();
+      Student newStudent = new Student("James Hanley");
+      newStudent.Save();
 
       //Act
-      testCategory.AddItem(testItem);
-      testCategory.Delete();
-
-      List<Category> resultItemCategories = testItem.GetCategories();
-      List<Category> testItemCategories = new List<Category> {};
+      Student result = Student.Find(newStudent.GetStudentId());
 
       //Assert
-      CollectionAssert.AreEqual(testItemCategories, resultItemCategories);
+      Assert.AreEqual(newStudent, result);
     }
     [TestMethod]
-    public void Test_AddItem_AddsItemToCategory()
+    public void GetStudents_Test()
     {
       //Arrange
-      Category testCategory = new Category("Household chores");
-      testCategory.Save();
-
-      Item testItem = new Item("Mow the lawn");
-      testItem.Save();
-
-      Item testItem2 = new Item("Water the garden");
-      testItem2.Save();
+      Student newStudent = new Student("Billy Kinzig");
+      newStudent.Save();
+      Course newCourse = new Course("2018-07-20", "MAT", 203);
+      newCourse.Save();
+      Course newCourse1 = new Course("2018-07-20", "PHY", 240);
+      newCourse1.Save();
 
       //Act
-      testCategory.AddItem(testItem);
-      testCategory.AddItem(testItem2);
+      newStudent.AddCourse(newCourse);
+      newStudent.AddCourse(newCourse1);
 
-      List<Item> result = testCategory.GetItems();
-      List<Item> testList = new List<Item>{testItem, testItem2};
+      List<Course> expectedResult = new List<Course>{newCourse, newCourse1};
+      List<Course> result = newStudent.GetCourses();
 
       //Assert
-      CollectionAssert.AreEqual(testList, result);
+      CollectionAssert.AreEqual(expectedResult, result);
     }
+    [TestMethod]
+    public void Edit_Test()
+    {
+      //Arrange
+      Student newStudent = new Student("Curt Cladwell");
+      newStudent.Save();
+      Student expectedStudent = new Student("Curt Caldwell", newStudent.GetStudentId());
+      //Act
+      newStudent.Edit("Curt Caldwell");
 
-    // [TestMethod]
-    // public void GetItems_RetrievesAllItemsWithCategory_ItemList()
-    // {
-    //   Category testCategory = new Category("Household chores");
-    //   testCategory.Save();
-    //
-    //   Item firstItem = new Item("Mow the lawn", testCategory.GetId());
-    //   firstItem.Save();
-    //   Item secondItem = new Item("Do the dishes", testCategory.GetId());
-    //   secondItem.Save();
-    //
-    //
-    //   List<Item> testItemList = new List<Item> {firstItem, secondItem};
-    //   List<Item> resultItemList = testCategory.GetItems();
-    //   Console.WriteLine("testItemList " + testItemList.Count);
-    //   Console.WriteLine("resultItemList " + resultItemList.Count);
-    //
-    //   CollectionAssert.AreEqual(testItemList, resultItemList);
-    // }
+      //Assert
+      Assert.AreEqual(expectedStudent, newStudent);
+    }
+    [TestMethod]
+    public void Delete_Test()
+    {
+      //Arrange
+      Student newStudent = new Student("Austin Barr");
+      newStudent.Save();
+      Student newStudent1 = new Student("Eliot Charette");
+      newStudent1.Save();
 
+      //Act
+      newStudent.Delete();
+      List<Student> result = Student.GetAllStudents();
+      List<Student> expectedResult = new List<Student>{newStudent1};
+      //Assert
+      CollectionAssert.AreEqual(expectedResult, result);
+    }
   }
 }

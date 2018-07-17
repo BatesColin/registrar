@@ -50,6 +50,10 @@ namespace Registrar.Models
         return (idEquality && nameEquality && enrollEquality && numberEquality);
       }
     }
+    public override int GetHashCode()
+    {
+      return this.GetCourseId().GetHashCode();
+    }
     public void Save()
     {
       MySqlConnection conn = DB.Connection();
@@ -70,7 +74,7 @@ namespace Registrar.Models
         conn.Dispose();
       }
     }
-    public List<Course> GetAllCourses()
+    public static List<Course> GetAllCourses()
     {
       List<Course> allCourses = new List<Course> {};
       MySqlConnection conn = DB.Connection();
@@ -83,7 +87,7 @@ namespace Registrar.Models
         int CourseId = rdr.GetInt32(0);
         string EnrollDate = rdr.GetString(1);
         string CourseName = rdr.GetString(2);
-        string CourseNumber = rdr.GetString(3);
+        int CourseNumber = rdr.GetInt32(3);
         Course newCourse = new Course(EnrollDate, CourseName, CourseNumber, CourseId);
         allCourses.Add(newCourse);
       }
@@ -93,6 +97,7 @@ namespace Registrar.Models
         conn.Dispose();
       }
       return allCourses;
+      // return new List<Course>{};
     }
     public static void DeleteAll()
     {
@@ -108,6 +113,122 @@ namespace Registrar.Models
       if (conn != null)
       {
         conn.Dispose();
+      }
+    }
+    public static Course Find(int id)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT * FROM courses WHERE id = (@searchId);";
+
+      cmd.Parameters.Add(new MySqlParameter("@searchId", id));
+
+      var rdr = cmd.ExecuteReader() as MySqlDataReader;
+      int CourseId = 0;
+      string EnrollDate = "";
+      string CourseName = "";
+      int CourseNumber = 0;
+
+      while(rdr.Read())
+      {
+        CourseId = rdr.GetInt32(0);
+        EnrollDate = rdr.GetString(1);
+        CourseName = rdr.GetString(2);
+        CourseNumber = rdr.GetInt32(3);
+      }
+      Course newCourse = new Course(EnrollDate, CourseName, CourseNumber, CourseId);
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      // return new Course("", "", 0);
+      return newCourse;
+    }
+    public void AddStudent(Student newStudent)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO students_courses (course_id, student_id) VALUES (@CourseId, @StudentId);";
+
+      cmd.Parameters.Add(new MySqlParameter("@CourseId", _courseId));
+      cmd.Parameters.Add(new MySqlParameter("@StudentId", newStudent.GetStudentId()));
+
+      cmd.ExecuteNonQuery();
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+    public List<Student> GetStudents()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT students.* FROM courses
+      JOIN students_courses ON (courses.id = students_courses.course_id)
+      JOIN students ON (students_courses.student_id = students.id)
+      WHERE courses.id = @CourseId;";
+
+      cmd.Parameters.Add(new MySqlParameter("@CourseId", _courseId));
+
+      MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
+      List<Student> students = new List<Student>{};
+
+      while(rdr.Read())
+      {
+        int studentId = rdr.GetInt32(0);
+        string studentName = rdr.GetString(1);
+        Student newStudent = new Student(studentName, studentId);
+        students.Add(newStudent);
+      }
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return students;
+      // return new List<Student>{};
+    }
+    public void Edit(string newEnrollDate, string newCourseName, int newCourseNumber)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"UPDATE courses SET enroll_date = @newEnrollDate, course_name = @newCourseName, course_number = @newCourseNumber WHERE id = @searchId;";
+
+      cmd.Parameters.Add(new MySqlParameter("@searchId", _courseId));
+      cmd.Parameters.Add(new MySqlParameter("@newEnrollDate", newEnrollDate));
+      cmd.Parameters.Add(new MySqlParameter("@newCourseName", newCourseName));
+      cmd.Parameters.Add(new MySqlParameter("@newCourseNumber", newCourseNumber));
+
+      cmd.ExecuteNonQuery();
+      _enrollDate = newEnrollDate;
+      _courseName = newCourseName;
+      _courseNumber = newCourseNumber;
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+    public void Delete()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"DELETE FROM courses WHERE id = @CourseId; DELETE FROM students_courses WHERE course_id = @CourseId;";
+
+      cmd.Parameters.Add(new MySqlParameter("@CourseId", this.GetCourseId()));
+
+      cmd.ExecuteNonQuery();
+      if (conn != null)
+      {
+        conn.Close();
       }
     }
   }
