@@ -3,12 +3,16 @@
   <tr>
     <th>Name</th>
     <th>Enrollment Date</th>
+    <th>Update</th>
+    <th>Delete</th>
   </tr>
   @foreach(var course in Model)
   {
     <tr>
       <td><a href="/courses/@course.GetCourseId()">@course.GetCourseName()@course.GetCourseNumber()</a></td>
       <td>@course.GetEnrollDate()</td>
+      <td><a href="/courses/@course.GetCourseId()/update">Edit</a></td>
+      <td><a href="/courses/@course.GetCourseId()/delete">Delete</a></td>
     </tr>
   }
 </table>

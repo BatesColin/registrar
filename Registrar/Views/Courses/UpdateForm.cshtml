@@ -1,0 +1,13 @@
+<h1>Edit a Course</h1>
+<hr />
+<form action="/courses/@Model.GetCourseId()/update" method="post">
+  <label for="updateenrolldate">Student Name:</label>
+  <input id="updateenrolldate" name="updateenrolldate" type="text" value="@Model.GetEnrollDate()">
+  <label for="updatecoursename">Student Name:</label>
+  <input id="updatecoursename" name="updatecoursename" type="text" value="@Model.GetCourseName()">
+  <label for="updatecoursenumber">Student Name:</label>
+  <input id="updatecoursenumber" name="updatecoursenumber" type="text" value="@Model.GetCourseNumber()">
+  <button type="submit">Update</button>
+</form>
+<h4><a href="/students">List of Courses</a></h4>
+<h4><a href="/">Return home</a></h4>

@@ -2,11 +2,16 @@
 <table>
   <tr>
     <th>Name</th>
+    <th>Update</th>
+    <th>Delete</th>
   </tr>
   @foreach(var student in Model)
   {
     <tr>
       <td><a href="/students/@student.GetStudentId()">@student.GetStudentName()</a></td>
+      <td><a href="/students/@student.GetStudentId()/update">Edit</a></td>
+      <td><a href="/students/@student.GetStudentId()/delete">Delete</a></td>
+
     </tr>
   }
 </table>

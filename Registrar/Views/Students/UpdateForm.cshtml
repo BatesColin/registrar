@@ -1,0 +1,9 @@
+<h1>Edit a Student</h1>
+<hr />
+<form action="/students/@Model.GetStudentId()/update" method="post">
+  <label for="updatestudent">Student Name:</label>
+  <input id="updatestudent" name="updatestudent" type="text" value="@Model.GetStudentName()">
+  <button type="submit">Update</button>
+</form>
+<h4><a href="/students">List of Students</a></h4>
+<h4><a href="/">Return home</a></h4>
