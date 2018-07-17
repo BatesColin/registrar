@@ -1,0 +1,14 @@
+<h1>Students</h1>
+<table>
+  <tr>
+    <th>Name</th>
+  </tr>
+  @foreach(var student in Model)
+  {
+    <tr>
+      <td><a href="/students/@student.GetStudentId()">@student.GetStudentName()</a></td>
+    </tr>
+  }
+</table>
+<p><a href="/students/new">Add a New Student</a></p>
+<p><a href="/">Back to Home</a></p>

@@ -1,0 +1,27 @@
+@using Registrar.Models;
+
+<h1>Course Information</h1>
+<h2>@Model["selectedCourse"].GetCourseName()@Model["selectedCourse"].GetCourseNumber()</h2>
+<hr />
+@if (@Model["courseStudents"].Count != 0)
+{
+  <h4>This course has these students:</h4>
+  <ul>
+    @foreach (Student student in @Model["courseStudents"])
+    {
+      <li>@student.GetStudentName()</li>
+    }
+  </ul>
+}
+<h4>Add a student to this course:</h4>
+<form action='/courses/@Model["selectedCourse"].GetCourseId()/students/new' method='post'>
+  <label for='studentid'>Select a student</label>
+  <select id='studentid' name='studentid' type='text'>
+    @foreach (var student in @Model["allStudents"])
+    {
+      <option value='@student.GetStudentId()'>@student.GetStudentName()</option>
+    }
+  </select>
+  <button type='submit'>Add</button>
+</form>
+<p><a href="/">Return to Main Page</a></p>

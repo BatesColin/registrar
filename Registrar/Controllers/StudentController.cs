@@ -66,7 +66,7 @@ namespace Registrar.Controllers
       model.Add("allCourses", allCourses);
       return View(model);
     }
-    [HttpPost("/students/{studentId}/categories/new")]
+    [HttpPost("/students/{studentId}/courses/new")]
     public ActionResult AddCourse(int studentId)
     {
       Student student = Student.Find(studentId);

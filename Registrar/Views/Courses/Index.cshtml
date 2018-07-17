@@ -1,14 +1,15 @@
 <h1>Courses</h1>
 <table>
   <tr>
-    <th>Course Name & Number</th>
+    <th>Name</th>
     <th>Enrollment Date</th>
   </tr>
   @foreach(var course in Model)
   {
-    <td>@course.GetEnrollDate()</td>
-    <td><a href="/courses/@course.GetCourseId()">@course.GetCourseName()@course.GetCourseNumber()</a></td>
-    <td></td>
+    <tr>
+      <td><a href="/courses/@course.GetCourseId()">@course.GetCourseName()@course.GetCourseNumber()</a></td>
+      <td>@course.GetEnrollDate()</td>
+    </tr>
   }
 </table>
 <p><a href="/courses/new">Add a New Course</a></p>
